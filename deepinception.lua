@@ -20,6 +20,7 @@ cmd:option('--dropout', false, 'use dropout')
 cmd:option('--dropoutProb', '{0.2,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}', 'dropout probabilities')
 -- data and preprocessing
 cmd:option('--dataset', 'Svhn', 'which dataset to use : Svhn | Mnist | NotMnist | Cifar10 | Cifar100')
+cmd:option('--imageSize', 32, 'imagesize directory to choose')
 cmd:option('--standardize', false, 'apply Standardize preprocessing')
 cmd:option('--zca', false, 'apply Zero-Component Analysis whitening')
 cmd:option('--lecunlcn', false, 'apply Yann LeCun Local Contrast Normalization (recommended)')
@@ -92,6 +93,9 @@ end
 local ds
 if opt.dataset == 'Svhn' then
    ds = dp.Svhn{input_preprocess = input_preprocess}
+elseif opt.dataset == 'securityCamera' then
+  sc=require('securityCamera.lua')
+  ds=sc.securityCamera( '/root/data/securityCamera/' .. opt.imageSize .. '/' , opt.imageSize )
 elseif opt.dataset == 'Mnist' then
    ds = dp.Mnist{input_preprocess = input_preprocess}
 elseif opt.dataset == 'NotMnist' then

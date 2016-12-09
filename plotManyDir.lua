@@ -2,6 +2,29 @@ require 'lfs'
 require 'torch' 
 require 'gnuplot'
 
+
+DIR_SEP='/' --should be "/" for Unix platforms (Linux and Mac)
+function browseFolder(root, includePattern, callback)  
+  -- starting at root, traverse all children directories that match includePattern, when find a directory, call callback with this path
+	for entity in lfs.dir(root) do
+		if entity~="." and entity~=".." then
+			local fullPath=root..DIR_SEP..entity
+			--print("root: "..root..", entity: "..entity..", mode: "..(lfs.attributes(fullPath,"mode")or "-")..", full path: "..fullPath)
+			local mode=lfs.attributes(fullPath,"mode")
+			if mode=="file" then
+				--this is where the processing happens. I print the name of the file and its path but it can be any code
+				print(root.." > "..entity)
+			elseif mode=="directory" then
+				browseFolder(fullPath);
+			end
+		end
+	end
+end
+
+--this is a sample call
+browseFolder(".")
+
+
 --[[command line arguments]]--
 
 cmd = torch.CmdLine()

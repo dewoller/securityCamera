@@ -1,4 +1,5 @@
 require 'dp'
+require 'optim'
 
 --[[command line arguments]]--
 cmd = torch.CmdLine()

@@ -1,0 +1,1 @@
+find /root/save/deep/E* -iname "metadata.dat" | while read i; do LOGDIR=$(dirname $i); IMAGELABEL=$(echo $LOGDIR | sed "s/[\/.:]/_/g;s/^_*//") ; th ./plotDir.lua --dir $LOGDIR --title "$IMAGELABEL" --outFile "/root/save/deep/png/$IMAGELABEL.png"; done
