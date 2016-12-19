@@ -1,4 +1,6 @@
 #!/bin/bash
+set -x
+set -v
 DEVICE=$(hostname)
 DEVICE=${DEVICE:8}
 EXPERIMENT=$1

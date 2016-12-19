@@ -1,6 +1,8 @@
 #!/bin/bash
+set -x 
+set -v
 DEVICE=$(hostname)
-DEVICE=${DEVICE:8}
+DEVICE=${DEVICE:7}
 EXPERIMENT=$1
 export DEEP_SAVE_BASE=/root/save/
 shift
