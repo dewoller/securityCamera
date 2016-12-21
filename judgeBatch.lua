@@ -10,8 +10,6 @@ function judgeBatch( model, images, labels)
       predictions=predictions:cat( batchPredictions )
     end
   end
-  local debugger = require('fb.debugger')
-  debugger.enter()
   local isCorrect = predictions:ne( labels ):nonzero():squeeze()
   local  badImages = images:index(1, isCorrect )
   local  origLabels = labels:index(1, isCorrect ) -- original label 

@@ -36,9 +36,13 @@ function M.incomingImages(dataPath, imgSize)
 
    for i=1,size do
      local filename = imageFiles:filename(i)
+     --print (filename)
      table.insert( filenames, filename )
-      local img = image.load( filename )
+      local img = image.load( filename , 3, 'byte')
       --images[i]:copy(image.scale( img, imgSize, imgSize ))  -- for resizing
+      if filename == '/store/images/incoming/128/CAM3_128-20161220204223-09.jpg' then
+        print( img:size(), i, images:size())
+      end
       images[i]:copy( img )
       collectgarbage()
    end
