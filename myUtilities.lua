@@ -1,12 +1,12 @@
 require('lfs')
 
 local M = {}
-function M.getFile(dir, pattern )  --  return the list of file that match this pattern
+function M.getFile(dir, filePattern )  --  return the list of file that match this filePattern
   rv={}
   --scan the directory's files
   for file in lfs.dir(dir) do
       --> look for any files ending with .jpg
-      if file:match( pattern ) then
+      if file:match( filePattern ) then
         rv[ #rv + 1 ] = dir .. '/' .. file
       end
   end
@@ -40,9 +40,6 @@ function M.incomingImages(dataPath, imgSize)
      table.insert( filenames, filename )
       local img = image.load( filename , 3, 'byte')
       --images[i]:copy(image.scale( img, imgSize, imgSize ))  -- for resizing
-      if filename == '/store/images/incoming/128/CAM3_128-20161220204223-09.jpg' then
-        print( img:size(), i, images:size())
-      end
       images[i]:copy( img )
       collectgarbage()
    end
@@ -51,5 +48,57 @@ function M.incomingImages(dataPath, imgSize)
 
    return images, filenames 
 end
+
+
+
+function M.allFilesMatching( base, dirPattern, filePattern, recurse )
+  recurse = recurse or false
+  filePattern=filePattern or '^.*$'
+  dirPattern=dirPattern or '^.*$'
+  rv={}
+  for file in lfs.dir( base ) do
+    if file~="." and file~=".." then
+      local fullpath = base .. '/' .. file
+      local mode =  lfs.attributes(fullpath, "mode")
+      if mode == "file" and string.match( file, filePattern ) ~= nil and string.match(fullpath, dirPattern) then 
+        table.insert(rv, base .. '/' .. file )
+      elseif mode == "directory" and recurse  then 
+        rv=M.appendTable( rv, M.allFilesMatching( fullpath, dirPattern, filePattern, recurse ))
+      end
+    end
+  end
+  return(rv)
+end 
+
+
+function M.appendTable( a, toappend )
+  for i,value in pairs(toappend) do
+     a[ #a + 1 ] = value
+  end
+  return(a)
+end
+
+function M.categoriseImages( model, images) 
+  local maxImagesInBatch = 100
+  local rv
+  for i,batch in pairs( images:split( maxImagesInBatch )) do
+    local predictions = model:forward( batch )
+    local __,targets = predictions:max(2)
+    if i==1 then
+      rv = targets
+    else
+      rv = rv:cat( targets, 1 )
+    end
+    collectgarbage()
+  end
+  return rv
+end
+
+function M.basename(str)
+	return string.gsub(str, "(.*/)(.*)", "%2")
+end
+
+
+
 return(M)
 

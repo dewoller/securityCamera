@@ -16,14 +16,14 @@ function M.securityCamera(dataPath, imgsize, validRatio)
    local target = torch.IntTensor(size):fill(1)
 
    for i=1,other:size() do
-      local img = image.load(other:filename(i))
+      local img = image.load(other:filename(i),3,'byte')
       local idx = shuffle[i]
       input[idx]:copy(img)
       collectgarbage()
    end
 
    for i=1,pp:size() do
-      local img = image.load(pp:filename(i))
+      local img = image.load(pp:filename(i),3,'byte')
       local idx = shuffle[i+other:size()]
       input[idx]:copy(img)
       target[idx] = 2
@@ -31,7 +31,7 @@ function M.securityCamera(dataPath, imgsize, validRatio)
    end
 
    for i=1,car:size() do
-      local img = image.load(car:filename(i))
+      local img = image.load(car:filename(i),3,'byte')
       local idx = shuffle[i+other:size() + pp:size() ]
       input[idx]:copy(img)
       target[idx] = 3

@@ -1,12 +1,12 @@
 dp=require 'dp' 
 optim=require('optim')
 mu=require 'myUtilities'
---cutorch=require 'cutorch'
---cunn=require 'cunn'
+cutorch=require 'cutorch'
+cunn=require 'cunn'
 
 imgSize='128'
---dat=torch.load( mu.getFile( '/root/save/deep/E49/' .. imgSize .. '/', '.*dat$')[1])
---m=dat:model()
+dat=torch.load( mu.getFile( '/root/save/deep/E47/' .. imgSize .. '/', '.*dat$')[1])
+m=dat:model()
 m=torch.load('E49_128_model.t7')
 
 
@@ -48,7 +48,8 @@ end
 
 print 'loading images'
 originalDatapath='/mnt/piplus/securityCamera/incoming/'
-datapath='/store/images/incoming/128/'
+--datapath='/store/images/incoming/128/'
+datapath='/root/data/securityCamera/128/other'
 images, filenames = mu.incomingImages(datapath, 128 )
 print (images:size())
 for i,name in ipairs(filenames) do
@@ -57,7 +58,7 @@ end
 
 print 'categorising images'
 
-labels=categoriseImages(m, images )
-print 'moving images'
-saveImages( filenames, labels, datapath, '/store/images/categorised/')
+--labels=categoriseImages(m, images )
+--print 'moving images'
+--saveImages( filenames, labels, datapath, '/store/images/categorised/')
 
