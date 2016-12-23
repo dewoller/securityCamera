@@ -3,13 +3,15 @@ set -x
 set -v
 DEVICE=$(hostname)
 DEVICE=${DEVICE:8}
+DEVICE=1
 EXPERIMENT=$1
 export DEEP_SAVE_BASE=/root/save/deep/
 shift
 #for i in 032  064  096 128  160  192  256  ; do 
-for i in 128  ; do 
-#for i in 128  160  192  256  32  64  96; do 
+#for i in 128  ; do 
+for i in 128  32  64  96; do 
   export DEEP_SAVE_PATH=$DEEP_SAVE_BASE/$EXPERIMENT/$i
+  rm -rf $DEEP_SAVE_PATH
   size=$(echo $i | sed 's/^0//')
   th deepinception.lua \
 	--dataset securityCamera \
