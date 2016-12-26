@@ -32,7 +32,6 @@ for file in lfs.dir(opt.dir) do
         end
         f=f:gsub('/',',')
         f=f:gsub('_',',')
-        f=f:gsub('(^,|root,|save,|deep,|log,|report,.dat)','')
         f=f:gsub('^,','')
         f=f:gsub('.dat','')
         f=f:gsub('report,','')
@@ -40,7 +39,7 @@ for file in lfs.dir(opt.dir) do
         f=f:gsub('deep,','')
         f=f:gsub('save,','')
         f=f:gsub('root,','')
-        print( string.format('%s,%f,%f,%.10f', f, dat[ opt.v1 ].feedback.confusion.accuracy, dat[ opt.v2 ].feedback.confusion.accuracy,  dat.optimizer[opt.v3]))
+        print( string.format('%s,%f,%f,%.10f,%s', f, dat[ opt.v1 ].feedback.confusion.accuracy, dat[ opt.v2 ].feedback.confusion.accuracy,  dat.optimizer[opt.v3], os.date('%Y-%m-%d %H:%M:%S',os.time())))
     end
 end
 
