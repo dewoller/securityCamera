@@ -98,7 +98,16 @@ function M.basename(str)
 	return string.gsub(str, "(.*/)(.*)", "%2")
 end
 
-
+function M.loadRequire(module, doStuffWhenNotFound)
+    local function requiref(module)
+        require(module)
+    end
+    res = pcall(requiref,module)
+    if not(res) and doStuffWhenNotFound then
+        -- Do Stuff when no module
+		doStuffWhenNotFound()
+    end
+end
 
 return(M)
 
