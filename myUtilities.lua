@@ -26,8 +26,9 @@ function M.unique(input)
   return out
 end
 
-function M.incomingImages(dataPath, imgSize)
+function M.incomingImages(dataPath, imgSize, needResize)
    -- 1. load imageFiles into images and target Tensors
+   needResize = needResize or false
    local imageFiles = paths.indexdir(dataPath, 'jpg' ) 
 
    local size = imageFiles:size() 
@@ -38,14 +39,14 @@ function M.incomingImages(dataPath, imgSize)
      local filename = imageFiles:filename(i)
      --print (filename)
      table.insert( filenames, filename )
-      local img = image.load( filename , 3, 'byte')
-      --images[i]:copy(image.scale( img, imgSize, imgSize ))  -- for resizing
-      images[i]:copy( img )
-      collectgarbage()
+     local img = image.load( filename , 3, 'byte')
+     if needResize then
+       images[i]:copy(image.scale( img, imgSize, imgSize ))  -- for resizing
+     else
+       images[i]:copy( img )
+     end
+     collectgarbage()
    end
-   --
-   -- 4. wrap datasets into datasource
-
    return images, filenames 
 end
 
@@ -79,7 +80,7 @@ function M.appendTable( a, toappend )
 end
 
 function M.categoriseImages( model, images) 
-  local maxImagesInBatch = 100
+  local maxImagesInBatch = 50
   local rv
   for i,batch in pairs( images:split( maxImagesInBatch )) do
     local predictions = model:forward( batch )
@@ -89,7 +90,7 @@ function M.categoriseImages( model, images)
     else
       rv = rv:cat( targets, 1 )
     end
-    collectgarbage()
+    print( 'chunk', i, 'garbage', collectgarbage() )
   end
   return rv
 end
@@ -98,6 +99,18 @@ function M.basename(str)
 	return string.gsub(str, "(.*/)(.*)", "%2")
 end
 
+
+function M.saveImages( filenames, labels, inDir, outDir, categories) 
+  -- copy images from /inDir/filename to outDir/label[i]/filename
+  local dirs = mu.unique( labels:squeeze():totable() )
+  categories = categories or dirs
+  for i,dirSuffix in pairs( categories ) do
+     os.execute(string.format( "mkdir -p %s/%s", outDir, dirSuffix ))
+  end
+  for i,filename in ipairs( filenames ) do 
+     os.execute( string.format( 'cp %s/%s %s/%s/%s', inDir, filename, outDir, categories[ labels[ i ]:totable()[1] ], filename) )
+  end
+end
 
 
 return(M)
