@@ -119,7 +119,7 @@ function M.getModelFromFile(filename)
 
   local input = assert(io.open(filename, "rb"))
   local format = 'ascii'
-  if input:read(1):byte() == 0 then
+  if input:read(1):byte()<32 then
     format='binary'
   end
   assert(input:close())
