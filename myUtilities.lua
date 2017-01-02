@@ -124,15 +124,16 @@ function M.getModelFromFile(filename)
   end
   assert(input:close())
 
-  module = torch.load(opt.inFile, format )
+  module = torch.load(filename, format )
   local model 
   local function module2model(module)
 	model = module:model()
   end
-
-  res = pcall(module2model,module)
-  if not(res) then
-	model = module()
+  
+  -- lets see if we can extract a model out of this module
+  if not( pcall(module2model,module) ) then
+    -- nope, it must have been a model all along
+	return( module )
   end
   return( model )
 
