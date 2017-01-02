@@ -112,6 +112,37 @@ function M.saveImages( filenames, labels, inDir, outDir, categories)
   end
 end
 
+
+function M.getModelFromFile(filename)
+  -- get a model from a file, dont care if model is in ascii file, and/or if the model is buried one layer deep in a DP module
+  -- first find if the model is ascii
+
+  local input = assert(io.open(filename, "rb"))
+  local t = 'ascii'
+  if a:read(1):byte() == 0 then
+    t='binary'
+  end
+  assert(input:close())
+
+  if t=='ascii' then
+	module = torch.load(opt.inFile, 'ascii')
+  else
+	module = torch.load(opt.inFile)
+  end
+  local model 
+	
+  local function module2model(module)
+	model = module:model()
+  end
+
+  res = pcall(requiref,module)
+  if not(res) then
+	model = module()
+  end
+  return( model )
+
+end
+
 function M.loadRequire(module, doStuffWhenNotFound)
     local function requiref(module)
         require(module)

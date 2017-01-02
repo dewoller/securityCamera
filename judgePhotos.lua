@@ -22,17 +22,19 @@ cmd:option('--needResize', false, 'boolean, do we need to resize incoming pictur
 cmd:option('--imageSize', 128, 'the size of the images in the model')
 cmd:option('--copyDir', '', 'where should we copy the files once we have judged them (this assumes we trust the model)')
 cmd:option('--stats', true, 'display per label frequencies ')
+cmd:option('--silent', false, 'dont print anything to stdout')
+cmd:text()
 opt = cmd:parse(arg or {})
+if not opt.silent then
+   table.print(opt)
+end
 
 if opt.photoDir== "" then
   print("I need photos to judge")
   return
 end
 
-model=torch.load( opt.model )
---if( type(model) ~= 'model') then
---  model=model:model()
---end
+model = mu.getModelFromFile(opt.model)
 
 categories = {'other','pp','car'}
 print 'loading images'
