@@ -118,24 +118,19 @@ function M.getModelFromFile(filename)
   -- first find if the model is ascii
 
   local input = assert(io.open(filename, "rb"))
-  local t = 'ascii'
-  if a:read(1):byte() == 0 then
-    t='binary'
+  local format = 'ascii'
+  if input:read(1):byte() == 0 then
+    format='binary'
   end
   assert(input:close())
 
-  if t=='ascii' then
-	module = torch.load(opt.inFile, 'ascii')
-  else
-	module = torch.load(opt.inFile)
-  end
+  module = torch.load(opt.inFile, format )
   local model 
-	
   local function module2model(module)
 	model = module:model()
   end
 
-  res = pcall(requiref,module)
+  res = pcall(module2model,module)
   if not(res) then
 	model = module()
   end
