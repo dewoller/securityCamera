@@ -17,7 +17,7 @@ cmd:text('Example:')
 cmd:text('$> th judgePhotos.lua --dir /securityCamera/incoming')
 cmd:text('Options:')
 cmd:option('--photoDir', '/store/images/incoming/128', 'picture source ')
-cmd:option('--originalDir', '/store/images/incoming/original', 'where the original pictures are, use this for the copy if exists')
+cmd:option('--originalDir', '', 'where the original pictures are, use this for the copy if exists')
 cmd:option('--model', '/code/securityCamera/E45_128_model.t7', 'model file used for judging pictures')
 cmd:option('--needResize', false, 'boolean, do we need to resize incoming pictures')
 cmd:option('--imageSize', 128, 'the size of the images in the model')
@@ -60,6 +60,10 @@ if opt.stats then
     print( string.format( '%s\t%i\t%i\t%f', category, i, freq[i], freq[i]/freq:sum() * 100))
   end
 end
+
+if opt.originalDir == '' then
+	opt.originalDir = opt.photoDir
+end 
 
 if opt.copyDir ~= '' then
   mu.saveImages( filenames, labels, opt.originalDir, opt.copyDir, categories)

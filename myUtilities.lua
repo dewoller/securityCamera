@@ -90,7 +90,6 @@ function M.categoriseImages( model, images)
     else
       rv = rv:cat( targets, 1 )
     end
-    print( 'chunk', i, 'garbage', collectgarbage() )
   end
   return rv
 end
