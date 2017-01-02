@@ -2,8 +2,9 @@ require 'torch'
 dp=require 'dp' 
 optim=require('optim')
 mu=dofile('myUtilities.lua')
---cutorch=require 'cutorch'
---cunn=require 'cunn'
+
+mu.loadRequire('cutorch')
+mu.loadRequire('cunn')
 
 require 'lfs' 
 
