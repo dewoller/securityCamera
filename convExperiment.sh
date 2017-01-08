@@ -17,6 +17,5 @@ for i in 032  064  096 128  ; do
   LOGFILE=$(find $CONV_SAVE_PATH -iname 'metadata.dat' | head -1)
   LOGDIR=$(dirname "$LOGFILE")
   IMAGELABEL=$(echo $LOGDIR | sed 's/[\/.:]/_/g;s/^_*//') 
-  th plotDir.lua --dir $LOGDIR --title "$IMAGELABEL" --outFile "$CONV_SAVE_BASE/png/$IMAGELABEL.png"
   find $LOGDIR -iname 'metadata*.dat' | while read i; do D=$(dirname $i) ;th report2csv.lua --dir $D; done >>convResults.csv
 done
