@@ -4,65 +4,73 @@ require 'gnuplot'
 
 
 DIR_SEP='/' --should be "/" for Unix platforms (Linux and Mac)
-function browseFolder(root, includePattern, callback)  
-  -- starting at root, traverse all children directories that match includePattern, when find a directory, call callback with this path
-	for entity in lfs.dir(root) do
-		if entity~="." and entity~=".." then
-			local fullPath=root..DIR_SEP..entity
-			--print("root: "..root..", entity: "..entity..", mode: "..(lfs.attributes(fullPath,"mode")or "-")..", full path: "..fullPath)
-			local mode=lfs.attributes(fullPath,"mode")
-			if mode=="file" then
-				--this is where the processing happens. I print the name of the file and its path but it can be any code
-				print(root.." > "..entity)
-			elseif mode=="directory" then
-				browseFolder(fullPath);
-			end
-		end
-	end
+function find(root, includePattern, type_, callback)  
+  -- starting at root, traverse all children directories, 
+  -- when find a directory/file of type_, 
+  -- that match includePattern, 
+  -- call callback with this path
+  for entity in lfs.dir(root) do
+      if entity~="." and entity~=".." then
+          local fullPath=root..DIR_SEP..entity
+          local mode=lfs.attributes(fullPath,"mode")
+          if mode=="file" and type_=="F" and fullPath:match( includePattern ) then
+            callback( fullPath )
+          elseif mode=="directory" then
+            if type_=='D' and fullPath:match( includePattern ) then
+              callback( fullPath )
+            end
+            browseFolder(fullPath);
+          end
+      end
+  end
 end
 
---this is a sample call
-browseFolder(".")
 
 
 --[[command line arguments]]--
 
 cmd = torch.CmdLine()
 cmd:text()
-cmd:text('Plot a directory worth of report*.dat files')
+cmd:text('Plot multiple directories worth of report*.dat files')
 cmd:text('Example:')
-cmd:text('$> th plotDir.lua --dir /root/save/9f9d4d47696f:1480488006:1/ ')
+cmd:text('$> th plotDir.lua --baseDir /root/save/ --includePattern "/032/" ')
 cmd:text('Options:')
-cmd:option('--dir', '.', 'directory for files')
-cmd:option('--v1', 'optimizer', 'v1 to plot')
-cmd:option('--v2', 'validator', 'v2 to plot')
-cmd:option('--v3', 'loss', 'v3 to plot')
+cmd:option('--baseDir', '.', 'base directory to start searching for report.dat files')
+cmd:option('--includePattern', '.', 'lua string matching pattern of files to include')
+cmd:option('--variable', 'loss', 'variable to plot;  optimizer, validator or loss')
 cmd:option('--title', '', 'Title to put on plot')
-cmd:option('--outFile', '', 'name of output file')
-cmd:option('--outFileLoss', '', 'name of loss output file')
+cmd:option('--outFile', './comparision.png', 'name of output file')
+cmd:option('--silent', false, 'dont print anything to stdout')
+cmd:text()
 opt = cmd:parse(arg or {})
-
-if opt.dir ~= "." and opt.outFile == './plot.png' then
-  print('plotting to default position' .. opt.dir .. "/plot.png")
-   opt.outFile= opt.dir .. "/plot.png"   
+if not opt.silent then
+   table.print(opt)
+  print('readin files starting at  ' .. opt.baseDir)
+  print('plotting to ' .. opt.outFile)
 end
-print('readin files from ' .. opt.dir)
-print('plotting to ' .. opt.outFile)
 
-v1={}
-v2={}
-v3={}
-for file in lfs.dir(opt.dir) do
-    if file:match( '^report_[0-9]*%.dat$') then
-        local f = opt.dir .. '/' .. file
-        --print ("\t "..f)
-        local dat=torch.load( f )
-        --print( opt.v1 )
-        --print(dat[ 'optimizer' ])
-        v1[ dat.epoch ] = dat[ opt.v1 ].feedback.confusion.accuracy
-        v2[ dat.epoch ] = dat[ opt.v2 ].feedback.confusion.accuracy
-        v3[ dat.epoch ] = dat.optimizer[opt.v3]
-    end
+local plotData={}
+local maxEpoch=0
+
+find( opt.baseDir, '/Torch.-%:%d$', 'D', processExperimentDirectory )
+
+function processExperimentDirectory (dirName )
+  local key=dirName:match("E%d+/"):match("[^/]*") .. "Size:" .. dirName:match("/%d+/"):match("%d*") 
+  find( dirName, '/Report_%d+%.dat$', 'F', processReportFile )
+end
+function processReportFile ( filename )
+  local dat=torch.load( filename )
+  local epoch=filename.match("Report_(%d+)%.dat")+0
+  if epoch > maxEpoch then
+    epoch = maxEpoch
+  end
+  if opt.variable ==  'loss' then
+    plotData[ key ][ epoch ] = dat.optimizer[opt.v3]
+  elseif opt.variable ==  'optimizer' then
+    plotData[ key ][ epoch ] = dat[ opt.v1 ].feedback.confusion.accuracy
+  elseif opt.variable ==  'validator' then
+    plotData[ key ][ epoch ] = dat[ opt.v2 ].feedback.confusion.accuracy
+  end
 end
 
 if (opt.outFile ~= '' ) then 
@@ -70,24 +78,12 @@ if (opt.outFile ~= '' ) then
   if opt.title ~= '' then
     gnuplot.title(opt.title)
   end
-  gnuplot.plot( 
-    {opt.v1, torch.Tensor(v1), '-' },
-    {opt.v2, torch.Tensor(v2), '~' },
-    {opt.v3, torch.Tensor(v3), '|' }
-  )
-
+  plotStruct = {}
+  for key,data in pairs(plotData) do
+     plotStruct[ key ] = { key, 1..maxEpoch, data }
+  end
+  gnuplot.plot(  plotStruct )
   gnuplot.plotflush()
 end 
 
-if (opt.outFileLoss ~= '' ) then 
-  gnuplot.pngfigure( opt.outFileLoss )
-  if opt.title ~= '' then
-    gnuplot.title(opt.title)
-  end
-  gnuplot.plot( 
-    {opt.v3, torch.Tensor(v3), '-' }
-  )
-
-  gnuplot.plotflush()
-end  
 
