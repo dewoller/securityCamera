@@ -93,6 +93,9 @@ end
 local ds
 if opt.dataset == 'Svhn' then
    ds = dp.Svhn{input_preprocess = input_preprocess}
+elseif opt.dataset == 'securityCamera2' then
+  sc=require('securityCamera2Category.lua')
+  ds=sc.securityCamera( '/root/data/securityCamera/128_2', 128)
 elseif opt.dataset == 'securityCamera' then
   sc=require('securityCamera.lua')
   ds=sc.securityCamera( '/root/data/securityCamera/' .. opt.imageSize .. '/' , opt.imageSize )
