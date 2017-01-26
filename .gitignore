@@ -3,5 +3,9 @@
 *.zip
 *.t7
 *.dat
-
+.doall*
+*.ascii
+*.bz2
+.*.un~
+.-lock*.xls*
 

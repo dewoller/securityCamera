@@ -6,7 +6,7 @@ set -v
 EXPERIMENT=$1
 export CONV_SAVE_BASE=/root/save/conv
 shift
-for i in 128  ; do 
+for i in 32 64 96  ; do 
   export DEEP_SAVE_PATH=$CONV_SAVE_BASE/$EXPERIMENT/$i
   size=$(echo $i | sed 's/^0//')
   th convolutionneuralnetwork.lua \
