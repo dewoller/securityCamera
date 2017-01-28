@@ -29,6 +29,7 @@ end
 function M.incomingImages(dataPath, imgSize, needResize)
    -- 1. load imageFiles into images and target Tensors
    needResize = needResize or false
+   print("searching for photos in ", dataPath)
    local imageFiles = paths.indexdir(dataPath, 'jpg' ) 
 
    local size = imageFiles:size() 

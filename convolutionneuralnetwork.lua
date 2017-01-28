@@ -88,7 +88,7 @@ if opt.dataset == 'Mnist' then
    ds = dp.Mnist{input_preprocess = input_preprocess}
 elseif opt.dataset == 'securityCamera2' then
   sc=require('securityCamera2Category.lua')
-  ds=sc.securityCamera2Category( '/root/data/securityCamera/128_2', 128)
+  ds=sc.securityCamera2Category( '/root/data/securityCamera/' .. opt.imageSize .. '_2' , opt.imageSize )
 elseif opt.dataset == 'securityCamera' then
   sc=require('securityCamera.lua')
   ds=sc.securityCamera( '/root/data/securityCamera/' .. opt.imageSize .. '/' , opt.imageSize )

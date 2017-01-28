@@ -35,6 +35,7 @@ if opt.photoDir== "" then
   return
 end
 
+print("loading model", opt.model )
 model = mu.getModelFromFile(opt.model)
 
 categories = {'other','pp','car'}
