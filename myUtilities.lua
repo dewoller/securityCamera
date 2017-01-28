@@ -107,7 +107,9 @@ function M.saveImages( filenames, labels, inDir, outDir, categories)
      os.execute(string.format( "mkdir -p %s/%s", outDir, dirSuffix ))
   end
   for i,filename in ipairs( filenames ) do 
-     os.execute( string.format( 'cp %s/%s %s/%s/%s', inDir, filename, outDir, categories[ labels[ i ]:totable()[1] ], filename) )
+    local cmd=string.format( 'cp %s/%s %s/%s/%s', inDir, filename, outDir, categories[ labels[ i ]:totable()[1] ], filename) 
+    print( cmd )
+    os.execute( cmd )
   end
 end
 
